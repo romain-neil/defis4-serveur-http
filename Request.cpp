@@ -46,14 +46,24 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 	}
 
 	//Detect request headers
-	//req.erase(0, req.find(''))
+	req.erase(0, req.find("\r\n")); //Erase first line
 
-	std::cout << "Is the request is valid : " << m_isValidRequest;
-	if(m_isValidRequest) {
-		std::cout << "url find : " << url;
+	std::istringstream iss(req);
+
+	for(std::string line; std::getline(iss, line);) {
+		//For each line of headers
+		if(!line.empty()) { //If we don't reach the end of the headers
+			int sep = line.find(':');
+
+			if(sep != std::string::npos) {
+				//Header found !
+				addHeader(line.substr(0, sep), (line.substr(sep + 2, line.size())));
+			}
+		} else {
+			//break, dont parse input for the moment
+			break;
+		}
 	}
-
-	std::cout << "Request : " << std::endl << req;
 
 	m_clientRequest = url;
 }
