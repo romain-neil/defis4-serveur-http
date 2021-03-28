@@ -42,10 +42,8 @@ HttpServer::HttpServer(int port, std::string  bindAddress) : m_port(port), m_bin
 	}
 
 	Compteur cptCarotte("carotte", 10);
-	Compteur cptEtoile("etoile", 10, true);
 
 	m_compteurs.push_back(cptCarotte);
-	m_compteurs.push_back(cptEtoile);
 }
 
 HttpServer::~HttpServer() {
@@ -106,28 +104,49 @@ void HttpServer::handleRoute(SOCKET client) {
 		response.setHttpStatusCode(400);
 	}
 
-	response.write();
-
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	closesocket(client);
 }
 
+void HttpServer::respond(Request *request, Response *response, const Compteur& cpt) {
+	std::string acceptHeader = request->getHeader("Accept");
+	std::string resp;
+
+	//Determine server response format
+	if(RequestUtil::AcceptEverything(acceptHeader)) {
+		//We respond html
+		response->setContentType("text/html; charset=utf-8");
+		resp = "<p>" + cpt.getNom() + " : " + std::to_string(cpt.getVal()) + "</p>";
+	} else if(RequestUtil::AcceptJson(acceptHeader)) {
+		//Some json
+		response->setContentType("application/json");
+		resp = jsonify(cpt);
+	} else {
+		//Respond text
+		response->setContentType("text/plain");
+		resp = cpt.getNom() + ": " + std::to_string(cpt.getVal());
+	}
+
+	response->write(resp);
+}
+
+std::string HttpServer::jsonify(const Compteur& cpt) {
+	return "{'compteur': '" + cpt.getNom() + "', 'value': '" + std::to_string(cpt.getVal()) + "'}";
+}
+
 void HttpServer::http_get_counter(Request *request, Response *response) {
 	//Get a specific counter
-
-	rj::Document doc;
-	doc.SetObject();
-
-	rj::Document::AllocatorType &allocator = doc.GetAllocator();
-
-	rj::Value arr(rj::kArrayType);
-
 	for(auto& cpt : m_compteurs) {
-		if(cpt.getNom() == request->getCounterName()) {
-			//If the counter exist
+		if(cpt.getNom() == request->getCounterName()) { //If the counter exist
 			cpt.inc(); //Increment counter value
+
+			respond(request, response, cpt);
+			break;
 		}
 	}
+
+	//Counter not found
+	response->setHttpStatusCode(404);
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {

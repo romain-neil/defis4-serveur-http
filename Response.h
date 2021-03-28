@@ -22,7 +22,9 @@ class Response {
 		explicit Response(SOCKET socket);
 		~Response() = default;
 
-		void write() const;
+		void write(const std::string& data);
+
+		void setContentType(const std::string &contentType);
 
 		void setHeader(const std::string& headerName, const std::string& headerValue);
 
@@ -30,11 +32,8 @@ class Response {
 
 	private:
 
-		unsigned int m_httpCode = 200;
-
 		SOCKET m_socket;
 
-		std::vector<std::string> m_responseHeader{};
 		std::stringstream m_response;
 
 };

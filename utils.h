@@ -38,6 +38,18 @@ namespace Http {
 
 }
 
+namespace RequestUtil {
+
+	bool AcceptEverything(const std::string &acceptHeader) {
+		return (acceptHeader == "*/*");
+	}
+
+	bool AcceptJson(const std::string &acceptHeader) {
+		return (acceptHeader.find("application/json") != std::string::npos);
+	}
+
+}
+
 #if defined(_WIN32)
 
 #include <winsock2.h>

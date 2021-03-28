@@ -60,8 +60,7 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 				addHeader(line.substr(0, sep), (line.substr(sep + 2, line.size())));
 			}
 		} else {
-			//break, dont parse input for the moment
-			break;
+			break; //break, dont parse input for the moment
 		}
 	}
 
@@ -113,14 +112,14 @@ void Request::determineRoute() {
 	}
 }
 
-std::pair<std::string, std::string> Request::getHeader(const std::string& name) {
+std::string Request::getHeader(const std::string& name) {
 	for(const auto& header : m_finalHeaders) {
 		if(header.first == name) {
-			return header;
+			return header.second;
 		}
 	}
 
-	return std::pair<std::string, std::string>();
+	return std::string();
 }
 
 void Request::addHeader(const std::string& name, const std::string& val) {

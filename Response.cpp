@@ -5,12 +5,19 @@
 #include "Response.h"
 
 Response::Response(SOCKET socket) : m_socket(socket) {
-	setHeader("Server", "TinyWebServer v1.0");
+	m_response << "HTTP/1.1 ";
 }
 
-void Response::write() const {
+void Response::write(const std::string& data) {
+	setHeader("Server", "TinyWebServer v1.0");
+	setHeader("Content-Length", std::to_string(data.length()));
+
 	//Write content to socket
 	send(m_socket, m_response.str().c_str(), m_response.str().length(), 0);
+}
+
+void Response::setContentType(const std::string &contentType) {
+	setHeader("Content-Type", contentType);
 }
 
 void Response::setHeader(const std::string& headerName, const std::string& headerValue) {
@@ -18,5 +25,5 @@ void Response::setHeader(const std::string& headerName, const std::string& heade
 }
 
 void Response::setHttpStatusCode(int code) {
-	m_httpCode = code;
+	m_response << code << " " << HttpStatus::reasonPhrase(code) << std::endl;
 }

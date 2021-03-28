@@ -10,7 +10,7 @@
 class Compteur {
 
 	public:
-		explicit Compteur(std::string  nom, int initialValue = 0, bool isSpecial = false);
+		explicit Compteur(std::string  nom, int initialValue = 0);
 		~Compteur() = default;
 
 		[[nodiscard]] const std::string &getNom() const {
@@ -31,7 +31,6 @@ class Compteur {
 	private:
 
 		std::string m_nom;
-		bool m_isSpecial;
 		int m_val = 0;
 
 };

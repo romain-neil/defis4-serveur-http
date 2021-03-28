@@ -46,6 +46,10 @@ class HttpServer {
 
 		void handleRoute(SOCKET client);
 
+		static void respond(Request *request, Response *response, const Compteur& compteur);
+
+		static std::string jsonify(const Compteur& cpt);
+
 		void http_get_counter(Request *request, Response *response);
 		void http_get_all_counters(Request *request, Response *response);
 		void http_post_counter(Request *request, Response *response);

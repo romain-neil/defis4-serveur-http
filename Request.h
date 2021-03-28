@@ -5,11 +5,12 @@
 #ifndef HTTP_COUNTER_REQUEST_H
 #define HTTP_COUNTER_REQUEST_H
 
-#include "utils.h"
 #include <vector>
 #include <unordered_map>
 #include <string>
 #include <sstream>
+
+#include "utils.h"
 
 class Request {
 
@@ -30,7 +31,7 @@ class Request {
 			return m_finalHeaders;
 		}
 
-		std::pair<std::string, std::string> getHeader(const std::string& name);
+		std::string getHeader(const std::string& name);
 
 		Http::Verb getVerb() {
 			return m_method;

@@ -6,12 +6,10 @@
 
 #include <utility>
 
-Compteur::Compteur(std::string nom, int initialValue, bool isSpecial) : m_nom(std::move(nom)), m_val(initialValue), m_isSpecial(isSpecial) {}
+Compteur::Compteur(std::string nom, int initialValue) : m_nom(std::move(nom)), m_val(initialValue) {}
 
 void Compteur::inc(int val) {
-	if(!m_isSpecial) {
-		m_val += val;
-	}
+	m_val += val;
 }
 
 void Compteur::setVal(int newVal) {
