@@ -1,0 +1,63 @@
+//
+// Created by Romain Neil on 26/03/2021.
+//
+
+#ifndef HTTP_COUNTER_HTTPSERVER_H
+#define HTTP_COUNTER_HTTPSERVER_H
+
+#include <functional>
+#include <string>
+#include <iostream>
+#include <utility>
+#include <vector>
+#include <thread>
+#include <chrono>
+
+#include "utils.h"
+
+#include "Request.h"
+#include "Response.h"
+
+#include "rapidjson/document.h"
+#include "rapidjson/writer.h"
+#include "rapidjson/stringbuffer.h"
+
+namespace rj = rapidjson;
+
+class HttpServer {
+
+	public:
+
+		explicit HttpServer(int port);
+		HttpServer(int port, std::string  bindAddress);
+		~HttpServer();
+
+		void describe() const;
+
+		[[noreturn]] void start();
+
+	protected:
+
+		SOCKET masterSocket;
+
+	private:
+
+		void acceptRequest();
+
+		void handleRoute(SOCKET client);
+
+		void http_get_counter(Request *request, Response *response);
+		void http_get_all_counters(Request *request, Response *response);
+		void http_post_counter(Request *request, Response *response);
+		void http_put_counter(Request *request, Response *response);
+		void http_del_counter(Request *request, Response *response);
+
+		int m_port;
+		std::string m_bindAddr;
+
+		std::vector<Compteur> m_compteurs;
+
+};
+
+
+#endif //HTTP_COUNTER_HTTPSERVER_H
