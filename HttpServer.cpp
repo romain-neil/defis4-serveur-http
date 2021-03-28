@@ -102,6 +102,7 @@ void HttpServer::handleRoute(SOCKET client) {
 	} else {
 		//Bad request
 		response.setHttpStatusCode(400);
+		response.write();
 	}
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -136,17 +137,33 @@ std::string HttpServer::jsonify(const Compteur& cpt) {
 
 void HttpServer::http_get_counter(Request *request, Response *response) {
 	//Get a specific counter
-	for(auto& cpt : m_compteurs) {
-		if(cpt.getNom() == request->getCounterName()) { //If the counter exist
-			cpt.inc(); //Increment counter value
+	std::string counter = request->getCounterName();
 
-			respond(request, response, cpt);
-			break;
+	//If this is the special counter
+	//Count all val of counters
+	if(counter == "etoile") {
+		Compteur etoile("etoile", 0);
+
+		for(auto &cpt : m_compteurs) {
+			etoile.inc(cpt.getVal());
+		}
+
+		respond(request, response, etoile);
+		return;
+	} else {
+		for(auto& cpt : m_compteurs) {
+			if(cpt.getNom() == counter) { //If the counter exist
+				cpt.inc(); //Increment counter value
+
+				respond(request, response, cpt);
+				return;
+			}
 		}
 	}
 
 	//Counter not found
 	response->setHttpStatusCode(404);
+	response->write();
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {

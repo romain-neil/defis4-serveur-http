@@ -22,6 +22,11 @@ class Response {
 		explicit Response(SOCKET socket);
 		~Response() = default;
 
+		/**
+		 * Send error to client
+		 */
+		void write();
+
 		void write(const std::string& data);
 
 		void setContentType(const std::string &contentType);

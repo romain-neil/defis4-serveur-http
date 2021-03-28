@@ -8,6 +8,11 @@ Response::Response(SOCKET socket) : m_socket(socket) {
 	m_response << "HTTP/1.1 ";
 }
 
+void Response::write() {
+	setContentType("text/plain");
+	write("Error !");
+}
+
 void Response::write(const std::string& data) {
 	setHeader("Server", "TinyWebServer v1.0");
 	setHeader("Content-Length", std::to_string(data.length()));
