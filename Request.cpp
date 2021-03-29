@@ -137,7 +137,7 @@ std::string Request::getParam(const std::string &name) {
 	}
 
 	return std::string();
-};
+}
 
 std::string Request::getHeader(const std::string& name) {
 	for(const auto& header : m_finalHeaders) {

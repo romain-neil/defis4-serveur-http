@@ -210,17 +210,42 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 }
 
 void HttpServer::http_put_counter(Request *request, Response *response) {
+	std::string counterName = request->getCounterName();
 
+	if(!counterName.empty()) {
+		for(auto &cpt : m_compteurs) {
+			if(cpt.getNom() == counterName) {
+				cpt.inc();
+
+				response->setHttpStatusCode(204);
+				response->write("");
+				return;
+			}
+		}
+	}
+
+	//If any error
+	response->setHttpStatusCode(400);
+	response->write();
 }
 
 void HttpServer::http_del_counter(Request *request, Response *response) {
 	std::string counterName = request->getCounterName();
 
 	if(!counterName.empty()) {
-		for(auto &cpt : m_compteurs) {
-			if(cpt.getNom() == counterName) {
-				//
+		for(auto it = m_compteurs.begin(); it != m_compteurs.end(); it++) {
+			if(it->getNom() == counterName) {
+				m_compteurs.erase(it);
+
+				response->setHttpStatusCode(200);
+				response->write("");
+
+				return;
 			}
 		}
 	}
+
+	//If any error
+	response->setHttpStatusCode(400);
+	response->write();
 }
