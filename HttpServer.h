@@ -44,7 +44,7 @@ class HttpServer {
 
 		static std::string jsonify(const Compteur& cpt);
 
-		void http_get_counter(Request *request, Response *response);
+		void http_get_counter(Request *request, Response *response, const std::string& name = "");
 		void http_get_all_counters(Request *request, Response *response);
 		void http_post_counter(Request *request, Response *response);
 		void http_put_counter(Request *request, Response *response);

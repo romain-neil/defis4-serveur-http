@@ -139,9 +139,15 @@ std::string HttpServer::jsonify(const Compteur& cpt) {
 	return "{'compteur': '" + cpt.getNom() + "', 'value': '" + std::to_string(cpt.getVal()) + "'}";
 }
 
-void HttpServer::http_get_counter(Request *request, Response *response) {
+void HttpServer::http_get_counter(Request *request, Response *response, const std::string& name) {
 	//Get a specific counter
-	std::string counter = request->getCounterName();
+	std::string counter;
+
+	if(name.empty()) {
+		counter = request->getCounterName();
+	} else {
+		counter = name;
+	}
 
 	//If this is the special counter
 	//Count all val of counters
@@ -157,8 +163,6 @@ void HttpServer::http_get_counter(Request *request, Response *response) {
 	} else {
 		for(auto& cpt : m_compteurs) {
 			if(cpt.getNom() == counter) { //If the counter exist
-				cpt.inc(); //Increment counter value
-
 				respond(request, response, cpt);
 				return;
 			}
@@ -186,7 +190,23 @@ void HttpServer::http_get_all_counters(Request *request, Response *response) {
 }
 
 void HttpServer::http_post_counter(Request *request, Response *response) {
+	//Create a new counter
+	if(request->getHeader("Content-Type").find("application/x-www-form-urlencoded") != std::string::npos) {
+		//Header exists and are of expected type
+		std::string newCounterName = request->getParam("name");
 
+		if(!newCounterName.empty()) {
+			Compteur cpt(newCounterName, 1);
+			m_compteurs.push_back(cpt);
+
+			//Redirect user to other page
+			http_get_counter(request, response, newCounterName);
+		} else {
+			//Send an error to the client
+			response->setHttpStatusCode(400);
+			response->write();
+		}
+	}
 }
 
 void HttpServer::http_put_counter(Request *request, Response *response) {
@@ -194,5 +214,13 @@ void HttpServer::http_put_counter(Request *request, Response *response) {
 }
 
 void HttpServer::http_del_counter(Request *request, Response *response) {
+	std::string counterName = request->getCounterName();
 
+	if(!counterName.empty()) {
+		for(auto &cpt : m_compteurs) {
+			if(cpt.getNom() == counterName) {
+				//
+			}
+		}
+	}
 }

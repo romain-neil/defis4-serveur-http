@@ -58,14 +58,29 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 		//For each line of headers
 		if(!line.empty()) { //If we don't reach the end of the headers
 			int sep = line.find(':');
+			int equ = line.find('=');
 
 			if(sep != std::string::npos) {
 				//Header found !
 				addHeader(line.substr(0, sep), (line.substr(sep + 2, line.size())));
+			} else if(equ != std::string::npos) { //Only accept 1 param for the moment
+				//We have some params !
+				int lineEnd = std::stoi(getHeader("Content-Length"));
+
+				//for(;lineEnd > 0; lineEnd--) {
+					//For each characters left, we parse params
+					int pos = line.find('=');
+
+					addParam(line.substr(0, pos), (line.substr(pos + 1, (lineEnd - (pos + 1)))));
+				//}
 			}
-		} else {
-			break; //break, dont parse input for the moment
 		}
+	}
+
+	if(m_method == Http::POST) {
+		//We need to check if all content were uploaded
+
+		//if(std::stoi(getHeader("Content-Length")))
 	}
 }
 
@@ -114,6 +129,16 @@ void Request::determineRoute() {
 	}
 }
 
+std::string Request::getParam(const std::string &name) {
+	for(const auto &param : m_params) {
+		if(param.first == name) {
+			return param.second;
+		}
+	}
+
+	return std::string();
+};
+
 std::string Request::getHeader(const std::string& name) {
 	for(const auto& header : m_finalHeaders) {
 		if(header.first == name) {
@@ -126,4 +151,8 @@ std::string Request::getHeader(const std::string& name) {
 
 void Request::addHeader(const std::string& name, const std::string& val) {
 	m_finalHeaders.insert({name, val});
+}
+
+void Request::addParam(const std::string &name, const std::string &val) {
+	m_params.insert({name, val});
 }
