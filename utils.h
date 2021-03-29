@@ -1,6 +1,8 @@
 //
-// Created by super on 28/03/2021.
+// Created by Romain Neil on 28/03/2021.
 //
+
+#pragma once
 
 #ifndef HTTP_COUNTER_UTILS_H
 #define HTTP_COUNTER_UTILS_H
@@ -36,16 +38,16 @@ namespace Http {
 		DELETE_CPT
 	};
 
-}
+	namespace RequestUtil {
 
-namespace RequestUtil {
+		inline bool AcceptEverything(const std::string &acceptHeader) {
+			return (acceptHeader == "*/*");
+		}
 
-	bool AcceptEverything(const std::string &acceptHeader) {
-		return (acceptHeader == "*/*");
-	}
+		inline bool AcceptJson(const std::string &acceptHeader) {
+			return (acceptHeader.find("application/json") != std::string::npos);
+		}
 
-	bool AcceptJson(const std::string &acceptHeader) {
-		return (acceptHeader.find("application/json") != std::string::npos);
 	}
 
 }

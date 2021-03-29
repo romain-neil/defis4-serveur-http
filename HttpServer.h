@@ -13,16 +13,10 @@
 #include <thread>
 #include <chrono>
 
-#include "utils.h"
+//#include "utils.h"
 
 #include "Request.h"
 #include "Response.h"
-
-#include "rapidjson/document.h"
-#include "rapidjson/writer.h"
-#include "rapidjson/stringbuffer.h"
-
-namespace rj = rapidjson;
 
 class HttpServer {
 

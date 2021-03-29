@@ -57,6 +57,8 @@ void HttpServer::describe() const {
 [[noreturn]] void HttpServer::start() {
 	while(true) {
 		acceptRequest();
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 }
 
@@ -114,11 +116,11 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 	std::string resp;
 
 	//Determine server response format
-	if(RequestUtil::AcceptEverything(acceptHeader)) {
+	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//We respond html
 		response->setContentType("text/html; charset=utf-8");
 		resp = "<p>" + cpt.getNom() + " : " + std::to_string(cpt.getVal()) + "</p>";
-	} else if(RequestUtil::AcceptJson(acceptHeader)) {
+	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
 		//Some json
 		response->setContentType("application/json");
 		resp = jsonify(cpt);
@@ -167,7 +169,18 @@ void HttpServer::http_get_counter(Request *request, Response *response) {
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {
-	//
+	std::stringstream ss;
+	ss << "{'counters': [";
+
+	for(const auto& cpt : m_compteurs) {
+		ss << "{'name': '" << cpt.getNom() << "', 'value': '" << cpt.getVal() << "'},";
+	}
+
+	ss << "]}";
+
+	response->setHttpStatusCode(200);
+	response->setContentType("application/json");
+	response->write(ss.str());
 }
 
 void HttpServer::http_post_counter(Request *request, Response *response) {
