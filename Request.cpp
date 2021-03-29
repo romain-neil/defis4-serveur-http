@@ -45,6 +45,10 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 		}
 	}
 
+	m_clientRequest = url;
+
+	std::cout << "Url : " << url << std::endl;
+
 	//Detect request headers
 	req.erase(0, req.find("\r\n")); //Erase first line
 
@@ -63,8 +67,6 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 			break; //break, dont parse input for the moment
 		}
 	}
-
-	m_clientRequest = url;
 }
 
 void Request::process() {
@@ -83,7 +85,7 @@ std::string Request::getCounterName() {
 }
 
 void Request::determineRoute() {
-	if(m_clientRequest == "/") {
+	if(m_clientRequest == "/" && m_clientRequest.length() == 1) {
 		//show all counters
 		m_methodEdit = true;
 	}

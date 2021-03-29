@@ -49,7 +49,7 @@ class Request {
 		Http::Url m_url;
 
 		bool m_isValidRequest = true;
-		bool m_methodEdit = true;
+		bool m_methodEdit = false;
 
 		SOCKET m_socket;
 

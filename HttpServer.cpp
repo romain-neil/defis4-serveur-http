@@ -115,6 +115,8 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 	std::string acceptHeader = request->getHeader("Accept");
 	std::string resp;
 
+	response->setHttpStatusCode(200);
+
 	//Determine server response format
 	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//We respond html
