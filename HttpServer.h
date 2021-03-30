@@ -13,8 +13,6 @@
 #include <thread>
 #include <chrono>
 
-//#include "utils.h"
-
 #include "Request.h"
 #include "Response.h"
 
@@ -22,8 +20,7 @@ class HttpServer {
 
 	public:
 
-		explicit HttpServer(int port);
-		HttpServer(int port, std::string  bindAddress);
+		HttpServer(int port, std::string  bindAddress = "127.0.0.0", std::string bindHost = "localhost");
 		~HttpServer();
 
 		void describe() const;
@@ -46,16 +43,21 @@ class HttpServer {
 
 		void http_get_counter(Request *request, Response *response, const std::string& name = "");
 		void http_get_all_counters(Request *request, Response *response);
-		void http_head(Request *request, Response *response);
 		void http_post_counter(Request *request, Response *response);
 		void http_put_counter(Request *request, Response *response);
 		void http_del_counter(Request *request, Response *response);
 
 		int m_port;
 		std::string m_bindAddr;
+		std::string m_bindHost;
 
 		std::vector<Compteur> m_compteurs;
 
+		/**
+		 * WARNING: Be sure to call counterExist before
+		 * @param name the counter name to get
+		 * @return the counter
+		 */
 		Compteur getCounter(const std::string &name);
 
 		bool counterExists(const std::string &name);

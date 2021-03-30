@@ -4,9 +4,7 @@
 
 #include "HttpServer.h"
 
-HttpServer::HttpServer(int port) : HttpServer(port, "127.0.0.1") {}
-
-HttpServer::HttpServer(int port, std::string  bindAddress) : m_port(port), m_bindAddr(std::move(bindAddress)) {
+HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost) : m_port(port), m_bindAddr(std::move(bindAddress)), m_bindHost(std::move(bindHost)) {
 #if defined(_WIN32)
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2,2), &WSAData);
@@ -25,6 +23,13 @@ HttpServer::HttpServer(int port, std::string  bindAddress) : m_port(port), m_bin
 	}
 
 	sockaddr_in sin = {0};
+
+	if(bindAddress.empty()) {
+		sin.sin_addr.s_addr = htonl(INADDR_ANY);
+	} else {
+		InetPton(AF_INET, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
+	}
+
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
