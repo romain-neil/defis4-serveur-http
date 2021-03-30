@@ -55,6 +55,10 @@ class HttpServer {
 
 		std::vector<Compteur> m_compteurs;
 
+		Compteur getCounter(const std::string &name);
+
+		bool counterExists(const std::string &name);
+
 };
 
 

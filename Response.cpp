@@ -13,6 +13,12 @@ void Response::write() {
 	write("Error !");
 }
 
+void Response::sendNotFound() {
+	setHttpStatusCode(404);
+	setContentType("text/html");
+	write("<p>The page you are looking for are not found</p>");
+}
+
 void Response::write(const std::string& data) {
 	setHeader("Server", "TinyWebServer v1.0");
 	setHeader("Content-Length", std::to_string(data.length()));

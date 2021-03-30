@@ -41,7 +41,7 @@ namespace Http {
 	namespace RequestUtil {
 
 		inline bool AcceptEverything(const std::string &acceptHeader) {
-			return (acceptHeader == "*/*");
+			return (acceptHeader.find("text/html") != std::string::npos) || (acceptHeader.find("*/*") != std::string::npos);
 		}
 
 		inline bool AcceptJson(const std::string &acceptHeader) {

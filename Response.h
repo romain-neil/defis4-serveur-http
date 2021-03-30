@@ -27,6 +27,8 @@ class Response {
 		 */
 		void write();
 
+		void sendNotFound();
+
 		void write(const std::string& data);
 
 		void setContentType(const std::string &contentType);

@@ -161,17 +161,14 @@ void HttpServer::http_get_counter(Request *request, Response *response, const st
 		respond(request, response, etoile);
 		return;
 	} else {
-		for(auto& cpt : m_compteurs) {
-			if(cpt.getNom() == counter) { //If the counter exist
-				respond(request, response, cpt);
-				return;
-			}
+		if(counterExists(counter)) {
+			respond(request, response, getCounter(counter));
+			return;
 		}
 	}
 
 	//Counter not found
-	response->setHttpStatusCode(404);
-	response->write();
+	response->sendNotFound();
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {
@@ -196,8 +193,10 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 		std::string newCounterName = request->getParam("name");
 
 		if(!newCounterName.empty()) {
-			Compteur cpt(newCounterName, 1);
-			m_compteurs.push_back(cpt);
+			if(!counterExists(newCounterName)) { //If the counter doesn't exists, we create it
+				Compteur cpt(newCounterName, 1);
+				m_compteurs.push_back(cpt);
+			}
 
 			//Redirect user to other page
 			http_get_counter(request, response, newCounterName);
@@ -248,4 +247,22 @@ void HttpServer::http_del_counter(Request *request, Response *response) {
 	//If any error
 	response->setHttpStatusCode(400);
 	response->write();
+}
+
+Compteur HttpServer::getCounter(const std::string &name) {
+	for(auto& cpt : m_compteurs) {
+		if(cpt.getNom() == name) {
+			return cpt;
+		}
+	}
+}
+
+bool HttpServer::counterExists(const std::string &name) {
+	for(const auto& cpt : m_compteurs) {
+		if(cpt.getNom() == name) {
+			return true;
+		}
+	}
+
+	return false;
 }
