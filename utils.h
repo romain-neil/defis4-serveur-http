@@ -15,6 +15,7 @@ namespace Http {
 
 	enum Verb {
 		GET = 0,
+		HEAD,
 		POST,
 		PUT,
 		DELETE_VERB,

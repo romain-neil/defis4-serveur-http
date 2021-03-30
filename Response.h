@@ -29,6 +29,11 @@ class Response {
 
 		void sendNotFound();
 
+		/**
+		 * Implement HEAD Request
+		 */
+		void dryRun();
+
 		void write(const std::string& data);
 
 		void setContentType(const std::string &contentType);
@@ -40,6 +45,8 @@ class Response {
 	private:
 
 		SOCKET m_socket;
+
+		bool m_isDryRun = false;
 
 		std::stringstream m_response;
 

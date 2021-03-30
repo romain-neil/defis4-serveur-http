@@ -14,6 +14,8 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 	//Detect http verb
 	if(req.find("GET") == 0) {
 		m_method = Http::GET;
+	} else if(req.find("HEAD") == 0) {
+		m_method = Http::HEAD;
 	} else if (req.find("POST") == 0) {
 		m_method = Http::POST;
 	} else if(req.find("PUT") == 0) {
@@ -107,6 +109,7 @@ void Request::determineRoute() {
 
 	switch(m_method) {
 		case Http::GET:
+		case Http::HEAD:
 			if(m_methodEdit) { //If we show all counters
 				m_url = Http::Url::GET_ALL_CPT;
 			} else {

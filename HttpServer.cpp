@@ -88,6 +88,11 @@ void HttpServer::handleRoute(SOCKET client) {
 
 	Response response(client);
 
+	if(method == Http::HEAD) {
+		response.dryRun();
+		method = Http::GET;
+	}
+
 	if(method == Http::GET) {
 		if(requestedUrl == Http::Url::GET_ALL_CPT) {
 			//show all counters, formatted
