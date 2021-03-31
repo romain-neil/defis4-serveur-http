@@ -10,7 +10,11 @@
 #include <string>
 #include <sstream>
 
+#include "rapidjson/document.h"
+
 #include "utils.h"
+
+namespace rj = rapidjson;
 
 class Request {
 
@@ -80,6 +84,11 @@ class Request {
 		 * Parse form params
 		 */
 		void parseFormParams();
+
+		/**
+		 * Sanitarize json string
+		 */
+		void sanitarizeJson();
 
 		Http::Verb m_method;
 		Http::Url m_url;

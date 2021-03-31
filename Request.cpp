@@ -77,10 +77,11 @@ void Request::extractHeaders() {
 	std::istringstream iss(m_req);
 	std::istringstream str;
 
+	//Extracting request headers
 	for(std::string line; std::getline(iss, line);) { //Until the blank line
 		//For each line of headers
 		//Until we reach blank line
-		if(!line.empty()) { //If we don't reach the end of the headers
+		if(!line.empty() && line.c_str()[0] != '{') { //If we don't reach the end of the headers
 			int sep = line.find(':');
 
 			if(sep != std::string::npos) {
@@ -91,12 +92,14 @@ void Request::extractHeaders() {
 				//Erase the line we just handle
 				m_req.erase(0, line.size() + 2);
 			}
+		} else {
+			break;
 		}
 	}
 
 	std::string ctHd = getHeader("Content-Type");
 
-	//If we have params in the request
+	//Extracting request parameters
 	if(!ctHd.empty()) {
 		if(ctHd == "application/json") {
 			parseJsonParams();
@@ -165,7 +168,18 @@ void Request::addParam(const std::string &name, const std::string &val) {
 }
 
 void Request::parseJsonParams() {
-	std::cout << m_req << std::endl;
+	m_req.erase(0, 2);
+
+	//Sanitarize json string
+	sanitarizeJson();
+
+	rj::Document doc;
+	doc.Parse(m_req.c_str());
+
+	assert(doc.HasMember("name"));
+	assert(doc["name"].IsString());
+
+	addParam("name", doc["name"].GetString());
 }
 
 void Request::parseFormParams() {
@@ -178,4 +192,18 @@ void Request::parseFormParams() {
 	int pos = m_req.find('=');
 
 	addParam(m_req.substr(0, pos), m_req.substr(pos + 1, (bytes - (pos + 1))));
+}
+
+void Request::sanitarizeJson() {
+	std::string json;
+
+	//For each char in the json
+	for(auto c : m_req) {
+		if(c != '\r' && c != '\n' && c != '\t') {
+			//We add that char to the final string
+			json.push_back(c);
+		}
+	}
+
+	m_req = json;
 }
