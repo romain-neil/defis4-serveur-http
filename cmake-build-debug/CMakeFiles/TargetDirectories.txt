@@ -1,3 +1,0 @@
-D:/Dev/http_counter/cmake-build-debug/CMakeFiles/http_counter.dir
-D:/Dev/http_counter/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/Dev/http_counter/cmake-build-debug/CMakeFiles/rebuild_cache.dir
