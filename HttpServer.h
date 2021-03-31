@@ -13,6 +13,7 @@
 #include <thread>
 #include <chrono>
 #include <fstream>
+#include <streambuf>
 #include <filesystem>
 
 #include "Request.h"
@@ -72,6 +73,12 @@ class HttpServer {
 		 * @return the counter
 		 */
 		Compteur getCounter(const std::string &name);
+
+		/**
+		 * Return the special counter "etoile"
+		 * @return The counter "etoile"
+		 */
+		Compteur getStartCounter();
 
 		bool counterExists(const std::string &name);
 

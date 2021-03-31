@@ -73,24 +73,20 @@ void HttpServer::loadHtmlContent() {
 	fs::path htmlHeader("header.html");
 	fs::path htmlFooter("footer.html");
 
+	std::cout << "Loading html content ..." << std::endl;
+
 	if(!fs::exists(htmlHeader) || !fs::exists(htmlFooter)) {
 		//One or more required file are missing
 		throw std::runtime_error("One or more required file(s) are missing");
 	}
 
-	std::ifstream ifstream;
+	std::ifstream header(htmlHeader.string());
+	std::ifstream footer(htmlFooter.string());
 
-	ifstream.open(htmlHeader.string());
-	if(ifstream.is_open()) {
-		ifstream >> m_htmlHeader;
-		ifstream.close();
-	}
+	m_htmlHeader = std::string((std::istreambuf_iterator<char>(header)), std::istreambuf_iterator<char>());
+	m_htmlFooter = std::string((std::istreambuf_iterator<char>(footer)), std::istreambuf_iterator<char>());
 
-	ifstream.open(htmlFooter.string());
-	if(ifstream.is_open()) {
-		ifstream >> m_htmlFooter;
-		ifstream.close();
-	}
+	std::cout << "html content loaded !" << std::endl;
 }
 
 void HttpServer::acceptRequest() {
@@ -177,6 +173,8 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 
 	response->setHttpStatusCode(200);
 
+	Compteur cptEtoile = getStartCounter();
+
 	//Determine server response format
 	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//Send html
@@ -187,6 +185,8 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 			resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
 		}
 
+		resp << "<tr><td>" << cptEtoile.getNom() << "</td><td>" << std::to_string(cptEtoile.getVal()) << "</td></tr>";
+
 		resp << m_htmlFooter;
 	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
 		response->json();
@@ -195,6 +195,8 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 		for(const auto& cpt : counters) {
 			resp << "{'name': '" << cpt.getNom() << "', 'value': '" << cpt.getVal() << "'},";
 		}
+
+		resp << "{'name': '" << cptEtoile.getNom() << "', 'value': '" << cptEtoile.getVal() << "'},";
 
 		resp << "]}";
 	}
@@ -219,23 +221,13 @@ void HttpServer::http_get_counter(Request *request, Response *response, const st
 	//If this is the special counter
 	//Count all val of counters
 	if(counter == "etoile") {
-		Compteur etoile("etoile", 0);
-
-		for(auto &cpt : m_compteurs) {
-			etoile.inc(cpt.getVal());
-		}
-
-		respond(request, response, etoile);
-		return;
+		respond(request, response, getStartCounter());
+	} else if (counterExists(counter)){
+		respond(request, response, getCounter(counter));
 	} else {
-		if(counterExists(counter)) {
-			respond(request, response, getCounter(counter));
-			return;
-		}
+		//Counter not found
+		response->sendNotFound();
 	}
-
-	//Counter not found
-	response->sendNotFound();
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {
@@ -313,6 +305,16 @@ Compteur HttpServer::getCounter(const std::string &name) {
 	}
 
 	return Compteur(std::string());
+}
+
+Compteur HttpServer::getStartCounter() {
+	Compteur cpt("etoile", 0);
+
+	for(auto &counter : m_compteurs) {
+		cpt.inc(counter.getVal());
+	}
+
+	return cpt;
 }
 
 bool HttpServer::counterExists(const std::string &name) {
