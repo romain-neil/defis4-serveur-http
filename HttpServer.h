@@ -5,6 +5,7 @@
 #ifndef HTTP_COUNTER_HTTPSERVER_H
 #define HTTP_COUNTER_HTTPSERVER_H
 
+#include <cmath>
 #include <functional>
 #include <string>
 #include <iostream>
@@ -82,10 +83,10 @@ class HttpServer {
 
 		bool counterExists(const std::string &name);
 
-		static void delay();
+		void delay();
 
 
-		static int facto(int n);
+		double facto(double n);
 
 };
 

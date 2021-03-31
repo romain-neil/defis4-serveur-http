@@ -238,7 +238,6 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 	std::string name = request->getParam("name");
 
 	//Create a new counter
-	//TODO: generalize the ccondition to take in account json and form POSt request
 	if(!name.empty()) {
 		//Header exists and are of expected type
 		if(!counterExists(name)) { //If the counter doesn't exists, we create it
@@ -335,9 +334,19 @@ bool HttpServer::counterExists(const std::string &name) {
 }
 
 void HttpServer::delay() {
-	std::cout << "Facto Time ! Val:" << facto(50) << std::endl;
+	std::cout << "Facto Time !" << std::endl;
+
+	for(int i = 0.; i < 100.; i++) {
+		facto(static_cast<double>(i));
+	}
 }
 
-int HttpServer::facto(int n) {
-	return (n > 1) ? (n * facto(n - 1)) : 1;
+double HttpServer::facto(double n) {
+	if(n > 1.) {
+		std::this_thread::sleep_for(std::chrono::milliseconds(5)); //Be nice with the OS and the CPU
+
+		return n * facto(n - 1.) + std::sqrt(n);
+	} else {
+		return 1;
+	}
 }
