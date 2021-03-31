@@ -173,13 +173,12 @@ void Request::parseJsonParams() {
 	//Sanitarize json string
 	sanitarizeJson();
 
-	rj::Document doc;
-	doc.Parse(m_req.c_str());
+	Json::Value root;
 
-	assert(doc.HasMember("name"));
-	assert(doc["name"].IsString());
+	std::stringstream ss(m_req);
+	ss >> root;
 
-	addParam("name", doc["name"].GetString());
+	addParam("name", root.get("name", "").asString());
 }
 
 void Request::parseFormParams() {
@@ -204,6 +203,9 @@ void Request::sanitarizeJson() {
 			json.push_back(c);
 		}
 	}
+
+	//Delete all useless chars in json
+	json.erase(json.find('}') + 1);
 
 	m_req = json;
 }

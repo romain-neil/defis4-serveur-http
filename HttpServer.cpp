@@ -235,24 +235,23 @@ void HttpServer::http_get_all_counters(Request *request, Response *response) {
 }
 
 void HttpServer::http_post_counter(Request *request, Response *response) {
+	std::string name = request->getParam("name");
+
 	//Create a new counter
-	if(request->getHeader("Content-Type").find("application/x-www-form-urlencoded") != std::string::npos) {
+	//TODO: generalize the ccondition to take in account json and form POSt request
+	if(!name.empty()) {
 		//Header exists and are of expected type
-		std::string newCounterName = request->getParam("name");
-
-		if(!newCounterName.empty()) {
-			if(!counterExists(newCounterName)) { //If the counter doesn't exists, we create it
-				Compteur cpt(newCounterName, 1);
-				m_compteurs.push_back(cpt);
-			}
-
-			//Redirect user to other page
-			http_get_counter(request, response, newCounterName);
-		} else {
-			//Send an error to the client
-			response->setHttpStatusCode(400);
-			response->write();
+		if(!counterExists(name)) { //If the counter doesn't exists, we create it
+			Compteur cpt(name, 1);
+			m_compteurs.push_back(cpt);
 		}
+
+		//Redirect user to other page
+		http_get_counter(request, response, name);
+	} else {
+		//Send an error to the client
+		response->setHttpStatusCode(400);
+		response->write();
 	}
 }
 

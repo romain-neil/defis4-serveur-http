@@ -10,11 +10,8 @@
 #include <string>
 #include <sstream>
 
-#include "rapidjson/document.h"
-
+#include "json/json.h"
 #include "utils.h"
-
-namespace rj = rapidjson;
 
 class Request {
 
