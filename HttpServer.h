@@ -12,9 +12,13 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <fstream>
+#include <filesystem>
 
 #include "Request.h"
 #include "Response.h"
+
+namespace fs = std::filesystem;
 
 class HttpServer {
 
@@ -33,11 +37,17 @@ class HttpServer {
 
 	private:
 
+		/**
+		 * Load html pages into memory
+		 */
+		void loadHtmlContent();
+
 		void acceptRequest();
 
 		void handleRoute(SOCKET client);
 
 		static void respond(Request *request, Response *response, const Compteur& compteur);
+		void respond(Request *request, Response *response, const std::vector<Compteur> &counters);
 
 		static std::string jsonify(const Compteur& cpt);
 
@@ -50,6 +60,9 @@ class HttpServer {
 		int m_port;
 		std::string m_bindAddr;
 		std::string m_bindHost;
+
+		std::string m_htmlHeader; //Html header
+		std::string m_htmlFooter; //Html footer
 
 		std::vector<Compteur> m_compteurs;
 

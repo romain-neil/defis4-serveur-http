@@ -60,10 +60,36 @@ void HttpServer::describe() const {
 }
 
 [[noreturn]] void HttpServer::start() {
+	loadHtmlContent();
+
 	while(true) {
 		acceptRequest();
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	}
+}
+
+void HttpServer::loadHtmlContent() {
+	fs::path htmlHeader("header.html");
+	fs::path htmlFooter("footer.html");
+
+	if(!fs::exists(htmlHeader) || !fs::exists(htmlFooter)) {
+		//One or more required file are missing
+		throw std::runtime_error("One or more required file(s) are missing");
+	}
+
+	std::ifstream ifstream;
+
+	ifstream.open(htmlHeader.string());
+	if(ifstream.is_open()) {
+		ifstream >> m_htmlHeader;
+		ifstream.close();
+	}
+
+	ifstream.open(htmlFooter.string());
+	if(ifstream.is_open()) {
+		ifstream >> m_htmlFooter;
+		ifstream.close();
 	}
 }
 
@@ -130,11 +156,11 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 	//Determine server response format
 	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//We respond html
-		response->setContentType("text/html; charset=utf-8");
+		response->html();
 		resp = "<p>" + cpt.getNom() + " : " + std::to_string(cpt.getVal()) + "</p>";
 	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
 		//Some json
-		response->setContentType("application/json");
+		response->json();
 		resp = jsonify(cpt);
 	} else {
 		//Respond text
@@ -143,6 +169,37 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 	}
 
 	response->write(resp);
+}
+
+void HttpServer::respond(Request *request, Response *response, const std::vector<Compteur> &counters) {
+	std::string acceptHeader = request->getHeader("Accept");
+	std::stringstream resp;
+
+	response->setHttpStatusCode(200);
+
+	//Determine server response format
+	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
+		//Send html
+		response->html();
+		resp << m_htmlHeader;
+
+		for(const auto &cpt : counters) {
+			resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
+		}
+
+		resp << m_htmlFooter;
+	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
+		response->json();
+		resp << "{'counters': [";
+
+		for(const auto& cpt : counters) {
+			resp << "{'name': '" << cpt.getNom() << "', 'value': '" << cpt.getVal() << "'},";
+		}
+
+		resp << "]}";
+	}
+
+	response->write(resp.str());
 }
 
 std::string HttpServer::jsonify(const Compteur& cpt) {
@@ -182,18 +239,7 @@ void HttpServer::http_get_counter(Request *request, Response *response, const st
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {
-	std::stringstream ss;
-	ss << "{'counters': [";
-
-	for(const auto& cpt : m_compteurs) {
-		ss << "{'name': '" << cpt.getNom() << "', 'value': '" << cpt.getVal() << "'},";
-	}
-
-	ss << "]}";
-
-	response->setHttpStatusCode(200);
-	response->setContentType("application/json");
-	response->write(ss.str());
+	respond(request, response, m_compteurs);
 }
 
 void HttpServer::http_post_counter(Request *request, Response *response) {

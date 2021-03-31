@@ -42,6 +42,16 @@ class Response {
 
 		void setHttpStatusCode(int code);
 
+		/**
+		 * Send html response
+		 */
+		void html();
+
+		/**
+		 * Send json response
+		 */
+		void json();
+
 	private:
 
 		SOCKET m_socket;

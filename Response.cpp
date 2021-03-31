@@ -46,3 +46,11 @@ void Response::setHeader(const std::string& headerName, const std::string& heade
 void Response::setHttpStatusCode(int code) {
 	m_response << code << " " << HttpStatus::reasonPhrase(code) << std::endl;
 }
+
+void Response::html() {
+	setContentType("text/html; charset=utf-8");
+}
+
+void Response::json() {
+	setContentType("application/json");
+}
