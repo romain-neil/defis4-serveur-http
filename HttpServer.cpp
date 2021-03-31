@@ -24,18 +24,18 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 
 	sockaddr_in sin = {0};
 
+	//Bind to specific ip address, or to 127.0.0.1 by default
 	if(bindAddress.empty()) {
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		InetPton(AF_INET, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
 	}
 
-	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
 
 	if(bind(masterSocket, reinterpret_cast<sockaddr*>(&sin), sizeof sin) == SOCKET_ERROR) {
-		perror("unabel to bind !");
+		perror("unable to bind !");
 		exit(errno);
 	}
 
