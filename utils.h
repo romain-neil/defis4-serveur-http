@@ -7,6 +7,7 @@
 #ifndef HTTP_COUNTER_UTILS_H
 #define HTTP_COUNTER_UTILS_H
 
+#include <iostream>
 #include <string>
 #include "http_status_codes.h"
 #include "Compteur.h"

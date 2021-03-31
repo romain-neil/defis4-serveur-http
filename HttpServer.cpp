@@ -139,7 +139,7 @@ void HttpServer::handleRoute(SOCKET client) {
 		response.write();
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(200));
+	delay();
 	closesocket(client);
 }
 
@@ -257,15 +257,23 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 
 void HttpServer::http_put_counter(Request *request, Response *response) {
 	std::string counterName = request->getCounterName();
+	std::string val = request->getParam("value");
 
-	if(!counterName.empty()) {
+	if(!counterName.empty() && !val.empty()) {
 		for(auto &cpt : m_compteurs) {
 			if(cpt.getNom() == counterName) {
-				cpt.inc();
+				int v = std::stoi(val);
 
-				response->setHttpStatusCode(204);
-				response->write("");
-				return;
+				if(v > cpt.getVal()) {
+					cpt.setVal(v);
+
+					response->setHttpStatusCode(204);
+					response->write("");
+
+					return;
+				}
+
+				break;
 			}
 		}
 	}
@@ -324,4 +332,12 @@ bool HttpServer::counterExists(const std::string &name) {
 	}
 
 	return false;
+}
+
+void HttpServer::delay() {
+	std::cout << "Facto Time ! Val:" << facto(50) << std::endl;
+}
+
+int HttpServer::facto(int n) {
+	return (n > 1) ? (n * facto(n - 1)) : 1;
 }

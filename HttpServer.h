@@ -82,6 +82,11 @@ class HttpServer {
 
 		bool counterExists(const std::string &name);
 
+		static void delay();
+
+
+		static int facto(int n);
+
 };
 
 

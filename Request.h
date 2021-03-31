@@ -72,6 +72,8 @@ class Request {
 		 */
 		void addParam(const std::string &name, const std::string &val);
 
+		void addParam(const std::string &name, int val);
+
 		/**
 		 * Parse json params
 		 */

@@ -167,6 +167,10 @@ void Request::addParam(const std::string &name, const std::string &val) {
 	m_params.insert({name, val});
 }
 
+void Request::addParam(const std::string &name, int val) {
+	addParam(name, std::to_string(val));
+}
+
 void Request::parseJsonParams() {
 	m_req.erase(0, 2);
 
@@ -178,7 +182,13 @@ void Request::parseJsonParams() {
 	std::stringstream ss(m_req);
 	ss >> root;
 
-	addParam("name", root.get("name", "").asString());
+	if(!root["name"].isNull()) {
+		addParam("name", root["name"].asString());
+	}
+
+	if(!root["value"].isNull()) {
+		addParam("value", root["value"].asInt());
+	}
 }
 
 void Request::parseFormParams() {
