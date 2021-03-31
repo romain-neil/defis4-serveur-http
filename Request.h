@@ -32,7 +32,7 @@ class Request {
 		 * @return all headers parsed
 		 */
 		std::unordered_map<std::string, std::string> getAllHeaders() {
-			return m_finalHeaders;
+			return m_headers;
 		}
 
 		std::string getParam(const std::string &name);
@@ -52,10 +52,23 @@ class Request {
 		 */
 		void extractHeaders();
 
+		/**
+		 * Determine the route from the client request
+		 */
 		void determineRoute();
 
+		/**
+		 * Add the header with his name and value
+		 * @param name name of the header
+		 * @param val value of the header
+		 */
 		void addHeader(const std::string& name, const std::string& val);
 
+		/**
+		 * Append param
+		 * @param name name of the parameter
+		 * @param val value of the parameter
+		 */
 		void addParam(const std::string &name, const std::string &val);
 
 		/**
@@ -80,16 +93,14 @@ class Request {
 		std::string m_req;
 
 		/**
-		 * Temp string stream
+		 * Request headers
 		 */
-		std::stringstream m_ss;
+		std::unordered_map<std::string, std::string> m_headers;
 
 		/**
 		 * Request params
 		 */
 		std::unordered_map<std::string, std::string> m_params;
-
-		std::unordered_map<std::string, std::string> m_finalHeaders;
 
 };
 

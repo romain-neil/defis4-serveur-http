@@ -53,6 +53,9 @@ Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
 
 		//if(std::stoi(getHeader("Content-Length")))
 	}*/
+
+	//Clear some unused stuff
+	m_req.clear();
 }
 
 void Request::process() {
@@ -144,7 +147,7 @@ std::string Request::getParam(const std::string &name) {
 }
 
 std::string Request::getHeader(const std::string& name) {
-	for(const auto& header : m_finalHeaders) {
+	for(const auto& header : m_headers) {
 		if(header.first == name) {
 			return header.second;
 		}
@@ -154,7 +157,7 @@ std::string Request::getHeader(const std::string& name) {
 }
 
 void Request::addHeader(const std::string& name, const std::string& val) {
-	m_finalHeaders.insert({name, val});
+	m_headers.insert({name, val});
 }
 
 void Request::addParam(const std::string &name, const std::string &val) {

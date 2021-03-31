@@ -13,6 +13,9 @@
 
 namespace Http {
 
+	/**
+	 * HTTP 1.1 Verb, take in account
+	 */
 	enum Verb {
 		GET = 0,
 		HEAD,
