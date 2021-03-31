@@ -265,6 +265,8 @@ Compteur HttpServer::getCounter(const std::string &name) {
 			return cpt;
 		}
 	}
+
+	return Compteur(std::string());
 }
 
 bool HttpServer::counterExists(const std::string &name) {

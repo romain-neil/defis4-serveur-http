@@ -47,11 +47,26 @@ class Request {
 
 	private:
 
+		/**
+		 * Extract headers from request
+		 */
+		void extractHeaders();
+
 		void determineRoute();
 
 		void addHeader(const std::string& name, const std::string& val);
 
 		void addParam(const std::string &name, const std::string &val);
+
+		/**
+		 * Parse json params
+		 */
+		void parseJsonParams();
+
+		/**
+		 * Parse form params
+		 */
+		void parseFormParams();
 
 		Http::Verb m_method;
 		Http::Url m_url;
@@ -62,6 +77,12 @@ class Request {
 		SOCKET m_socket;
 
 		std::string m_clientRequest;
+		std::string m_req;
+
+		/**
+		 * Temp string stream
+		 */
+		std::stringstream m_ss;
 
 		/**
 		 * Request params

@@ -13,6 +13,10 @@ class Compteur {
 		explicit Compteur(std::string  nom, int initialValue = 0);
 		~Compteur() = default;
 
+		/**
+		 * Get the name of the counter
+		 * @return the counter name
+		 */
 		[[nodiscard]] const std::string &getNom() const {
 			return m_nom;
 		}
@@ -25,7 +29,12 @@ class Compteur {
 			return m_val;
 		}
 
+		/**
+		 * Increase the counter value
+		 * @param val value, default at 1
+		 */
 		void inc(int val = 1);
+
 		void setVal(int newVal);
 
 	private:

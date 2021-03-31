@@ -4,8 +4,6 @@
 
 #include "Compteur.h"
 
-#include <utility>
-
 Compteur::Compteur(std::string nom, int initialValue) : m_nom(std::move(nom)), m_val(initialValue) {}
 
 void Compteur::inc(int val) {
