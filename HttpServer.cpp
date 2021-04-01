@@ -4,6 +4,8 @@
 
 #include "HttpServer.h"
 
+#include <utility>
+
 HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost) : m_port(port), m_bindAddr(std::move(bindAddress)), m_bindHost(std::move(bindHost)) {
 #if defined(_WIN32)
 	WSADATA WSAData;
@@ -41,7 +43,7 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 
 	puts("bind done");
 
-	if(listen(masterSocket, 32) == SOCKET_ERROR) {
+	if(::listen(masterSocket, 32) == SOCKET_ERROR) {
 		perror("listen()");
 		exit(errno);
 	}
@@ -57,6 +59,10 @@ HttpServer::~HttpServer() {
 
 void HttpServer::describe() const {
 	std::cout << "The server is listening on port " << m_port << std::endl;
+}
+
+void HttpServer::listen(std::string url) {
+	m_bindHost = std::string(std::move(url));
 }
 
 [[noreturn]] void HttpServer::start() {
@@ -115,27 +121,33 @@ void HttpServer::handleRoute(SOCKET client) {
 
 	Response response(client);
 
-	if(method == Http::HEAD) {
-		response.dryRun();
-		method = Http::GET;
-	}
-
-	if(method == Http::GET) {
-		if(requestedUrl == Http::Url::GET_ALL_CPT) {
-			//show all counters, formatted
-			http_get_all_counters(&request, &response);
-		} else {
-			http_get_counter(&request, &response);
+	//If the requested host is the same as configured
+	if(request.getHeader("Host").find(m_bindHost) != std::string::npos) {
+		if(method == Http::HEAD) {
+			response.dryRun();
+			method = Http::GET;
 		}
-	} else if(method == Http::POST) {
-		http_post_counter(&request, &response);
-	} else if(method == Http::PUT) {
-		http_put_counter(&request, &response);
-	} else if(method == Http::DELETE_VERB) {
-		http_del_counter(&request, &response);
+
+		if(method == Http::GET) {
+			if(requestedUrl == Http::Url::GET_ALL_CPT) {
+				//show all counters, formatted
+				http_get_all_counters(&request, &response);
+			} else {
+				http_get_counter(&request, &response);
+			}
+		} else if(method == Http::POST) {
+			http_post_counter(&request, &response);
+		} else if(method == Http::PUT) {
+			http_put_counter(&request, &response);
+		} else if(method == Http::DELETE_VERB) {
+			http_del_counter(&request, &response);
+		} else {
+			//Bad request
+			response.setHttpStatusCode(400);
+			response.write();
+		}
 	} else {
-		//Bad request
-		response.setHttpStatusCode(400);
+		response.setHttpStatusCode(404);
 		response.write();
 	}
 

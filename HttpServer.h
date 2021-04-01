@@ -31,6 +31,8 @@ class HttpServer {
 
 		void describe() const;
 
+		void listen(std::string url);
+
 		[[noreturn]] void start();
 
 	protected:
@@ -84,7 +86,6 @@ class HttpServer {
 		bool counterExists(const std::string &name);
 
 		void delay();
-
 
 		double facto(double n);
 
