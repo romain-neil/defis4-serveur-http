@@ -348,7 +348,7 @@ bool HttpServer::counterExists(const std::string &name) {
 void HttpServer::delay() {
 	std::cout << "Facto Time !" << std::endl;
 
-	for(int i = 0.; i < 100.; i++) {
+	for(int i = 0.; i < 20.; i++) {
 		facto(static_cast<double>(i));
 	}
 }
