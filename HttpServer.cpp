@@ -166,8 +166,8 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 		//We respond html
 		response->html();
 		resp << m_htmlHeader;
-
 		resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
+		resp << m_htmlFooter;
 	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
 		//Some json
 		response->json();
