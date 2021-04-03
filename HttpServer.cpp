@@ -157,7 +157,7 @@ void HttpServer::handleRoute(SOCKET client) {
 
 void HttpServer::respond(Request *request, Response *response, const Compteur& cpt) {
 	std::string acceptHeader = request->getHeader("Accept");
-	std::string resp;
+	std::stringstream resp;
 
 	response->setHttpStatusCode(200);
 
@@ -165,18 +165,20 @@ void HttpServer::respond(Request *request, Response *response, const Compteur& c
 	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//We respond html
 		response->html();
-		resp = "<p>" + cpt.getNom() + " : " + std::to_string(cpt.getVal()) + "</p>";
+		resp << m_htmlHeader;
+
+		resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
 	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
 		//Some json
 		response->json();
-		resp = jsonify(cpt);
+		resp << jsonify(cpt);
 	} else {
 		//Respond text
 		response->setContentType("text/plain");
-		resp = cpt.getNom() + ": " + std::to_string(cpt.getVal());
+		resp << cpt.getNom() + ": " + std::to_string(cpt.getVal());
 	}
 
-	response->write(resp);
+	response->write(resp.str());
 }
 
 void HttpServer::respond(Request *request, Response *response, const std::vector<Compteur> &counters) {

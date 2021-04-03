@@ -50,7 +50,7 @@ class HttpServer {
 
 		void handleRoute(SOCKET client);
 
-		static void respond(Request *request, Response *response, const Compteur& compteur);
+		void respond(Request *request, Response *response, const Compteur& compteur);
 		void respond(Request *request, Response *response, const std::vector<Compteur> &counters);
 
 		static std::string jsonify(const Compteur& cpt);
