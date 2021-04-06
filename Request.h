@@ -17,7 +17,7 @@ class Request {
 
 	public:
 
-		Request(SOCKET client, char buffer[]);
+		Request(SOCKET client, std::string buffer);
 
 		/**
 		 * Process client request
@@ -38,7 +38,7 @@ class Request {
 
 		std::string getParam(const std::string &name);
 
-		std::string getHeader(const std::string& name);
+		std::string getHeader(std::string name);
 
 		Http::Verb getVerb() {
 			return m_method;
@@ -63,7 +63,7 @@ class Request {
 		 * @param name name of the header
 		 * @param val value of the header
 		 */
-		void addHeader(const std::string& name, const std::string& val);
+		void addHeader(std::string name, const std::string& val);
 
 		/**
 		 * Append param

@@ -48,13 +48,7 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 		exit(errno);
 	}
 
-	Compteur cptCarotte("carotte", 10);
-
-	m_compteurs.push_back(cptCarotte);
-}
-
-HttpServer::~HttpServer() {
-	m_compteurs.clear();
+	m_compteurs.emplace_back("carotte", 10);
 }
 
 void HttpServer::describe() const {
@@ -62,7 +56,7 @@ void HttpServer::describe() const {
 }
 
 void HttpServer::listen(std::string url) {
-	m_bindHost = std::string(std::move(url));
+	m_bindHost = std::move(url);
 }
 
 [[noreturn]] void HttpServer::start() {
@@ -70,8 +64,6 @@ void HttpServer::listen(std::string url) {
 
 	while(true) {
 		acceptRequest();
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	}
 }
 
@@ -87,7 +79,12 @@ void HttpServer::loadHtmlContent() {
 	}
 
 	std::ifstream header(htmlHeader.string());
+	if (!header)
+		throw std::runtime_error("failed to open header.html");
+
 	std::ifstream footer(htmlFooter.string());
+	if (!footer)
+		throw std::runtime_error("failed to open header.html");
 
 	m_htmlHeader = std::string((std::istreambuf_iterator<char>(header)), std::istreambuf_iterator<char>());
 	m_htmlFooter = std::string((std::istreambuf_iterator<char>(footer)), std::istreambuf_iterator<char>());
@@ -97,7 +94,7 @@ void HttpServer::loadHtmlContent() {
 
 void HttpServer::acceptRequest() {
 	sockaddr_in csin = {0};
-	int sinsize = sizeof csin;
+	socklen_t sinsize = sizeof csin;
 	SOCKET csock_tmp = accept(masterSocket, reinterpret_cast<sockaddr*>(&csin), &sinsize);
 
 	if(csock_tmp != INVALID_SOCKET) {
@@ -187,7 +184,7 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 
 	response->setHttpStatusCode(200);
 
-	Compteur cptEtoile = getStartCounter();
+	Compteur cptEtoile = getStarCounter();
 
 	//Determine server response format
 	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
@@ -235,13 +232,14 @@ void HttpServer::http_get_counter(Request *request, Response *response, const st
 	//If this is the special counter
 	//Count all val of counters
 	if(counter == "etoile") {
-		respond(request, response, getStartCounter());
-	} else if (counterExists(counter)){
-		respond(request, response, getCounter(counter));
-	} else {
-		//Counter not found
-		response->sendNotFound();
+		respond(request, response, getStarCounter());
 	}
+	else if (auto compteurOpt = getCounter(counter))
+	{
+		respond(request, response, *compteurOpt);
+	}
+	else
+		response->sendNotFound();
 }
 
 void HttpServer::http_get_all_counters(Request *request, Response *response) {
@@ -317,17 +315,17 @@ void HttpServer::http_del_counter(Request *request, Response *response) {
 	response->write();
 }
 
-Compteur HttpServer::getCounter(const std::string &name) {
+std::optional<std::reference_wrapper<Compteur>> HttpServer::getCounter(const std::string &name) {
 	for(auto& cpt : m_compteurs) {
 		if(cpt.getNom() == name) {
 			return cpt;
 		}
 	}
 
-	return Compteur(std::string());
+	return {};
 }
 
-Compteur HttpServer::getStartCounter() {
+Compteur HttpServer::getStarCounter() {
 	Compteur cpt("etoile", 0);
 
 	for(auto &counter : m_compteurs) {

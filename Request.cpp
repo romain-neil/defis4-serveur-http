@@ -3,14 +3,11 @@
 //
 
 #include <iostream>
+#include <algorithm>
 #include "Request.h"
 
-Request::Request(SOCKET client, char buffer[]) : m_socket(client) {
-	m_url = Http::Url::UNKNOWN;
-
-	//Parse http request
-	m_req = std::string(buffer);
-
+Request::Request(SOCKET client, std::string buffer) : m_url(Http::Url::UNKNOWN), m_socket(client), m_req(std::move(buffer))
+{
 	//Detect http verb
 	if(m_req.find("GET") == 0) {
 		m_method = Http::GET;
@@ -78,26 +75,22 @@ void Request::extractHeaders() {
 	std::istringstream str;
 
 	//Extracting request headers
-	for(std::string line; std::getline(iss, line);) { //Until the blank line
+	std::string line;
+	while (std::getline(iss, line) && !line.empty() && line != "\r") { //Until the blank line
 		//For each line of headers
 		//Until we reach blank line
-		if(!line.empty() && line.c_str()[0] != '{') { //If we don't reach the end of the headers
-			int sep = line.find(':');
+		int sep = line.find(':');
+		if(sep != std::string::npos) {
+			//Header found !
+			line.pop_back();
+			addHeader(line.substr(0, sep), (line.substr(sep + 2, line.size() - 1)));
 
-			if(sep != std::string::npos) {
-				//Header found !
-				line.pop_back();
-				addHeader(line.substr(0, sep), (line.substr(sep + 2, line.size() - 1)));
-
-				//Erase the line we just handle
-				m_req.erase(0, line.size() + 2);
-			}
-		} else {
-			break;
+			//Erase the line we just handle
+			m_req.erase(0, line.size() + 2);
 		}
 	}
 
-	std::string ctHd = getHeader("Content-Type");
+	std::string ctHd = getHeader("content-type");
 
 	//Extracting request parameters
 	if(!ctHd.empty()) {
@@ -149,7 +142,8 @@ std::string Request::getParam(const std::string &name) {
 	return std::string();
 }
 
-std::string Request::getHeader(const std::string& name) {
+std::string Request::getHeader(std::string name) {
+	std::transform(name.begin(), name.end(), name.begin(), [](char c) { return std::tolower(c); });
 	for(const auto& header : m_headers) {
 		if(header.first == name) {
 			return header.second;
@@ -159,7 +153,8 @@ std::string Request::getHeader(const std::string& name) {
 	return std::string();
 }
 
-void Request::addHeader(const std::string& name, const std::string& val) {
+void Request::addHeader(std::string name, const std::string& val) {
+	std::transform(name.begin(), name.end(), name.begin(), [](char c) { return std::tolower(c); });
 	m_headers.insert({name, val});
 }
 
@@ -182,11 +177,11 @@ void Request::parseJsonParams() {
 	std::stringstream ss(m_req);
 	ss >> root;
 
-	if(!root["name"].isNull()) {
+	if(root.isMember("name")) {
 		addParam("name", root["name"].asString());
 	}
 
-	if(!root["value"].isNull()) {
+	if(root.isMember("value")) {
 		addParam("value", root["value"].asInt());
 	}
 }

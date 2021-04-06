@@ -16,6 +16,7 @@
 #include <fstream>
 #include <streambuf>
 #include <filesystem>
+#include <optional>
 
 #include "Request.h"
 #include "Response.h"
@@ -27,7 +28,7 @@ class HttpServer {
 	public:
 
 		HttpServer(int port, std::string  bindAddress = "127.0.0.0", std::string bindHost = "localhost");
-		~HttpServer();
+		~HttpServer() = default;
 
 		void describe() const;
 
@@ -75,13 +76,13 @@ class HttpServer {
 		 * @param name the counter name to get
 		 * @return the counter
 		 */
-		Compteur getCounter(const std::string &name);
+		std::optional<std::reference_wrapper<Compteur>> getCounter(const std::string &name);
 
 		/**
 		 * Return the special counter "etoile"
 		 * @return The counter "etoile"
 		 */
-		Compteur getStartCounter();
+		Compteur getStarCounter();
 
 		bool counterExists(const std::string &name);
 
