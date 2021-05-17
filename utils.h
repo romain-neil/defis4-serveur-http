@@ -82,6 +82,8 @@ typedef struct sockaddr_in SOCKADDR_IN;
 typedef struct sockaddr SOCKADDR;
 typedef struct in_addr IN_ADDR;
 
+#define InetPton inet_pton
+
 #endif
 
 #endif //HTTP_COUNTER_UTILS_H
