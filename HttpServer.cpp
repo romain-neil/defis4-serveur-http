@@ -15,12 +15,10 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 	masterSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	if(masterSocket == INVALID_SOCKET) {
-		perror("failed to bind");
+		std::cerr << "failed to bind" << std::endl;
 
 #if defined(_WIN32)
-		const DWORD lastError = WSAGetLastError();
-
-		puts("error: " + lastError);
+		std::cerr << "Error: " << WSAGetLastError() << std::endl;
 #endif
 	}
 
@@ -49,6 +47,12 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 	}
 
 	m_compteurs.emplace_back("carotte", 10);
+}
+
+HttpServer::~HttpServer() {
+#if defined(_WIN32)
+	WSACleanup();
+#endif
 }
 
 void HttpServer::describe() const {
@@ -342,6 +346,7 @@ bool HttpServer::counterExists(const std::string &name) {
 		}
 	}
 
+	//return std::any_of(m_compteurs.begin(), m_compteurs.end(), [](const Compteur& cpt) { return cpt.getNom() == name; });
 	return false;
 }
 
