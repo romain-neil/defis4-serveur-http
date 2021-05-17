@@ -32,7 +32,7 @@ void Response::write(const std::string& data) {
 	}
 
 	//Write content to socket
-	send(m_socket, m_response.str().c_str(), m_response.str().length(), 0);
+	send(m_socket, m_response.str().c_str(), static_cast<int>(m_response.str().size()), 0);
 }
 
 void Response::setContentType(const std::string &contentType) {
