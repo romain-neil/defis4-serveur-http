@@ -25,7 +25,7 @@ Request::Request(SOCKET client, std::string buffer) : m_url(Http::Url::UNKNOWN),
 	}
 
 	//Detect http url (if any)
-	int url_start_pos = m_req.find('/');
+	std::size_t url_start_pos = m_req.find('/');
 	std::string url;
 
 	if(url_start_pos != std::string::npos) {
@@ -44,7 +44,7 @@ Request::Request(SOCKET client, std::string buffer) : m_url(Http::Url::UNKNOWN),
 
 	extractHeaders();
 
-	/* //TODO
+	/* //TODO: check if all post content were uploaded
 	if(m_method == Http::POST) {
 		//We need to check if all content were uploaded
 
@@ -79,7 +79,7 @@ void Request::extractHeaders() {
 	while (std::getline(iss, line) && !line.empty() && line != "\r") { //Until the blank line
 		//For each line of headers
 		//Until we reach blank line
-		int sep = line.find(':');
+		std::size_t sep = line.find(':');
 		if(sep != std::string::npos) {
 			//Header found !
 			line.pop_back();
@@ -193,7 +193,7 @@ void Request::parseFormParams() {
 	//We erase the blank line in the request
 	m_req.erase(0, 2);
 
-	int pos = m_req.find('=');
+	std::size_t pos = m_req.find('=');
 
 	addParam(m_req.substr(0, pos), m_req.substr(pos + 1, (bytes - (pos + 1))));
 }

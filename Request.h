@@ -13,6 +13,11 @@
 #include "json/json.h"
 #include "utils.h"
 
+/**
+ * Représente la requête d'un client
+ * @author Romain Neil
+ * @since 1.0
+ */
 class Request {
 
 	public:
@@ -24,6 +29,10 @@ class Request {
 		 */
 		void process();
 
+		/**
+		 * Get the client requested url
+		 * @return the url
+		 */
 		Http::Url getUrl() {
 			return m_url;
 		}
