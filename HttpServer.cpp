@@ -152,7 +152,6 @@ void HttpServer::handleRoute(SOCKET client) {
 		response.write();
 	}
 
-	delay();
 	closesocket(client);
 }
 
@@ -348,22 +347,4 @@ bool HttpServer::counterExists(const std::string &name) {
 
 	//return std::any_of(m_compteurs.begin(), m_compteurs.end(), [](const Compteur& cpt) { return cpt.getNom() == name; });
 	return false;
-}
-
-void HttpServer::delay() {
-	std::cout << "Facto Time !" << std::endl;
-
-	for(int i = 0.; i < 20.; i++) {
-		facto(static_cast<double>(i));
-	}
-}
-
-double HttpServer::facto(double n) {
-	if(n > 1.) {
-		std::this_thread::sleep_for(std::chrono::milliseconds(5)); //Be nice with the OS and the CPU
-
-		return n * facto(n - 1.) + std::sqrt(n);
-	} else {
-		return 1;
-	}
 }

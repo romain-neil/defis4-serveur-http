@@ -27,8 +27,8 @@ class HttpServer {
 
 	public:
 
-		HttpServer(int port, std::string  bindAddress = "127.0.0.0", std::string bindHost = "localhost");
-		~HttpServer() = default;
+		explicit HttpServer(int port, std::string  bindAddress = "127.0.0.0", std::string bindHost = "localhost");
+		~HttpServer();
 
 		void describe() const;
 
@@ -85,10 +85,6 @@ class HttpServer {
 		Compteur getStarCounter();
 
 		bool counterExists(const std::string &name);
-
-		void delay();
-
-		double facto(double n);
 
 };
 
