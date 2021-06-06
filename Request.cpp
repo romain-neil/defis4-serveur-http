@@ -72,7 +72,6 @@ std::string Request::getCounterName() {
 
 void Request::extractHeaders() {
 	std::istringstream iss(m_req);
-	std::istringstream str;
 
 	//Extracting request headers
 	std::string line;
