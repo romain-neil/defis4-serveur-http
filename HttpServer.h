@@ -72,7 +72,6 @@ class HttpServer {
 		std::vector<Compteur> m_compteurs;
 
 		/**
-		 * WARNING: Be sure to call counterExist before
 		 * @param name the counter name to get
 		 * @return the counter
 		 */
