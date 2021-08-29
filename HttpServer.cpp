@@ -14,7 +14,7 @@ HttpServer::HttpServer(int port, std::string bindAddress, std::string bindHost) 
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 #endif
 
-	masterSocket = socket(AF_INET, SOCK_STREAM, 0);
+	masterSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
 
 	if (masterSocket == INVALID_SOCKET) {
 		std::cerr << "failed to bind" << std::endl;
