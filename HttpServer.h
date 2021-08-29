@@ -27,7 +27,7 @@ class HttpServer {
 
 	public:
 
-		explicit HttpServer(int port, std::string bindAddress = "127.0.0.0", std::string bindHost = "localhost");
+		explicit HttpServer(int port, std::string bindAddress = "127.0.0.0", bool ipv6 = false, std::string bindHost = "localhost");
 
 		~HttpServer();
 

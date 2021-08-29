@@ -6,15 +6,18 @@
 
 #include <utility>
 
-HttpServer::HttpServer(int port, std::string bindAddress, std::string bindHost) : m_port(port),
-																				  m_bindAddr(std::move(bindAddress)),
-																				  m_bindHost(std::move(bindHost)) {
+HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string bindHost) : m_port(port),																						 m_bindAddr(std::move(
+																									 bindAddress)),
+																							 m_bindHost(std::move(
+																									 bindHost)) {
 #if defined(_WIN32)
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
 #endif
 
-	masterSocket = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+	int family = (ipv6 ? AF_INET6 : AF_INET);
+
+	masterSocket = socket(family, SOCK_STREAM, IPPROTO_TCP);
 
 	if (masterSocket == INVALID_SOCKET) {
 		std::cerr << "failed to bind" << std::endl;
@@ -30,10 +33,10 @@ HttpServer::HttpServer(int port, std::string bindAddress, std::string bindHost) 
 	if (bindAddress.empty()) {
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
-		InetPton(AF_INET, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
+		InetPton(family, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
 	}
 
-	sin.sin_family = AF_INET;
+	sin.sin_family = family;
 	sin.sin_port = htons(port);
 
 	if (bind(masterSocket, reinterpret_cast<sockaddr *>(&sin), sizeof sin) == SOCKET_ERROR) {
