@@ -6,15 +6,17 @@
 
 #include <utility>
 
-HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost) : m_port(port), m_bindAddr(std::move(bindAddress)), m_bindHost(std::move(bindHost)) {
+HttpServer::HttpServer(int port, std::string bindAddress, std::string bindHost) : m_port(port),
+																				  m_bindAddr(std::move(bindAddress)),
+																				  m_bindHost(std::move(bindHost)) {
 #if defined(_WIN32)
 	WSADATA WSAData;
-	WSAStartup(MAKEWORD(2,2), &WSAData);
+	WSAStartup(MAKEWORD(2, 2), &WSAData);
 #endif
 
 	masterSocket = socket(AF_INET, SOCK_STREAM, 0);
 
-	if(masterSocket == INVALID_SOCKET) {
+	if (masterSocket == INVALID_SOCKET) {
 		std::cerr << "failed to bind" << std::endl;
 
 #if defined(_WIN32)
@@ -25,7 +27,7 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 	sockaddr_in sin = {0};
 
 	//Bind to specific ip address, or to 127.0.0.1 by default
-	if(bindAddress.empty()) {
+	if (bindAddress.empty()) {
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		InetPton(AF_INET, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
@@ -34,14 +36,14 @@ HttpServer::HttpServer(int port, std::string  bindAddress, std::string bindHost)
 	sin.sin_family = AF_INET;
 	sin.sin_port = htons(port);
 
-	if(bind(masterSocket, reinterpret_cast<sockaddr*>(&sin), sizeof sin) == SOCKET_ERROR) {
+	if (bind(masterSocket, reinterpret_cast<sockaddr *>(&sin), sizeof sin) == SOCKET_ERROR) {
 		perror("unable to bind !");
 		exit(errno);
 	}
 
-	puts("bind done");
+	std::cerr << "Bind done." << std::endl;
 
-	if(::listen(masterSocket, 32) == SOCKET_ERROR) {
+	if (::listen(masterSocket, 32) == SOCKET_ERROR) {
 		perror("listen()");
 		exit(errno);
 	}
@@ -66,7 +68,7 @@ void HttpServer::listen(std::string url) {
 [[noreturn]] void HttpServer::start() {
 	loadHtmlContent();
 
-	while(true) {
+	while (true) {
 		acceptRequest();
 	}
 }
@@ -77,7 +79,7 @@ void HttpServer::loadHtmlContent() {
 
 	std::cout << "Loading html content ..." << std::endl;
 
-	if(!fs::exists(htmlHeader) || !fs::exists(htmlFooter)) {
+	if (!fs::exists(htmlHeader) || !fs::exists(htmlFooter)) {
 		//One or more required file are missing
 		throw std::runtime_error("One or more required file(s) are missing");
 	}
@@ -99,9 +101,9 @@ void HttpServer::loadHtmlContent() {
 void HttpServer::acceptRequest() {
 	sockaddr_in csin = {0};
 	socklen_t sinsize = sizeof csin;
-	SOCKET csock_tmp = accept(masterSocket, reinterpret_cast<sockaddr*>(&csin), &sinsize);
+	SOCKET csock_tmp = accept(masterSocket, reinterpret_cast<sockaddr *>(&csin), &sinsize);
 
-	if(csock_tmp != INVALID_SOCKET) {
+	if (csock_tmp != INVALID_SOCKET) {
 		//handle client request here
 		handleRoute(csock_tmp);
 	} else {
@@ -123,24 +125,24 @@ void HttpServer::handleRoute(SOCKET client) {
 	Response response(client);
 
 	//If the requested host is the same as configured
-	if(request.getHeader("Host").find(m_bindHost) != std::string::npos) {
-		if(method == Http::HEAD) {
+	if (request.getHeader("Host").find(m_bindHost) != std::string::npos) {
+		if (method == Http::HEAD) {
 			response.dryRun();
 			method = Http::GET;
 		}
 
-		if(method == Http::GET) {
-			if(requestedUrl == Http::Url::GET_ALL_CPT) {
+		if (method == Http::GET) {
+			if (requestedUrl == Http::Url::GET_ALL_CPT) {
 				//show all counters, formatted
 				http_get_all_counters(&request, &response);
 			} else {
 				http_get_counter(&request, &response);
 			}
-		} else if(method == Http::POST) {
+		} else if (method == Http::POST) {
 			http_post_counter(&request, &response);
-		} else if(method == Http::PUT) {
+		} else if (method == Http::PUT) {
 			http_put_counter(&request, &response);
-		} else if(method == Http::DELETE_VERB) {
+		} else if (method == Http::DELETE_VERB) {
 			http_del_counter(&request, &response);
 		} else {
 			//Bad request
@@ -155,20 +157,20 @@ void HttpServer::handleRoute(SOCKET client) {
 	closesocket(client);
 }
 
-void HttpServer::respond(Request *request, Response *response, const Compteur& cpt) {
+void HttpServer::respond(Request *request, Response *response, const Compteur &cpt) {
 	std::string acceptHeader = request->getHeader("Accept");
 	std::stringstream resp;
 
 	response->setHttpStatusCode(200);
 
 	//Determine server response format
-	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
+	if (Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//We respond html
 		response->html();
 		resp << m_htmlHeader;
 		resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
 		resp << m_htmlFooter;
-	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
+	} else if (Http::RequestUtil::AcceptJson(acceptHeader)) {
 		//Some json
 		response->json();
 		resp << jsonify(cpt);
@@ -190,23 +192,23 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 	Compteur cptEtoile = getStarCounter();
 
 	//Determine server response format
-	if(Http::RequestUtil::AcceptEverything(acceptHeader)) {
+	if (Http::RequestUtil::AcceptEverything(acceptHeader)) {
 		//Send html
 		response->html();
 		resp << m_htmlHeader;
 
-		for(const auto &cpt : counters) {
+		for (const auto &cpt: counters) {
 			resp << "<tr><td>" << cpt.getNom() << "</td><td>" << std::to_string(cpt.getVal()) << "</td></tr>";
 		}
 
 		resp << "<tr><td>" << cptEtoile.getNom() << "</td><td>" << std::to_string(cptEtoile.getVal()) << "</td></tr>";
 
 		resp << m_htmlFooter;
-	} else if(Http::RequestUtil::AcceptJson(acceptHeader)) {
+	} else if (Http::RequestUtil::AcceptJson(acceptHeader)) {
 		response->json();
 		resp << "{'counters': [";
 
-		for(const auto& cpt : counters) {
+		for (const auto &cpt: counters) {
 			resp << "{'name': '" << cpt.getNom() << "', 'value': '" << cpt.getVal() << "'},";
 		}
 
@@ -218,15 +220,15 @@ void HttpServer::respond(Request *request, Response *response, const std::vector
 	response->write(resp.str());
 }
 
-std::string HttpServer::jsonify(const Compteur& cpt) {
+std::string HttpServer::jsonify(const Compteur &cpt) {
 	return "{'compteur': '" + cpt.getNom() + "', 'value': '" + std::to_string(cpt.getVal()) + "'}";
 }
 
-void HttpServer::http_get_counter(Request *request, Response *response, const std::string& name) {
+void HttpServer::http_get_counter(Request *request, Response *response, const std::string &name) {
 	//Get a specific counter
 	std::string counter;
 
-	if(name.empty()) {
+	if (name.empty()) {
 		counter = request->getCounterName();
 	} else {
 		counter = name;
@@ -234,14 +236,11 @@ void HttpServer::http_get_counter(Request *request, Response *response, const st
 
 	//If this is the special counter
 	//Count all val of counters
-	if(counter == "etoile") {
+	if (counter == "etoile") {
 		respond(request, response, getStarCounter());
-	}
-	else if (auto compteurOpt = getCounter(counter))
-	{
+	} else if (auto compteurOpt = getCounter(counter)) {
 		respond(request, response, *compteurOpt);
-	}
-	else
+	} else
 		response->sendNotFound();
 }
 
@@ -253,9 +252,9 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 	std::string name = request->getParam("name");
 
 	//Create a new counter
-	if(!name.empty()) {
+	if (!name.empty()) {
 		//Header exists and are of expected type
-		if(!counterExists(name)) { //If the counter doesn't exists, we create it
+		if (!counterExists(name)) { //If the counter doesn't exists, we create it
 			Compteur cpt(name, 1);
 			m_compteurs.push_back(cpt);
 		}
@@ -273,12 +272,12 @@ void HttpServer::http_put_counter(Request *request, Response *response) {
 	std::string counterName = request->getCounterName();
 	std::string val = request->getParam("value");
 
-	if(!counterName.empty() && !val.empty()) {
-		for(auto &cpt : m_compteurs) {
-			if(cpt.getNom() == counterName) {
+	if (!counterName.empty() && !val.empty()) {
+		for (auto &cpt: m_compteurs) {
+			if (cpt.getNom() == counterName) {
 				int v = std::stoi(val);
 
-				if(v > cpt.getVal()) {
+				if (v > cpt.getVal()) {
 					cpt.setVal(v);
 
 					response->setHttpStatusCode(204);
@@ -300,9 +299,9 @@ void HttpServer::http_put_counter(Request *request, Response *response) {
 void HttpServer::http_del_counter(Request *request, Response *response) {
 	std::string counterName = request->getCounterName();
 
-	if(!counterName.empty()) {
-		for(auto it = m_compteurs.begin(); it != m_compteurs.end(); it++) {
-			if(it->getNom() == counterName) {
+	if (!counterName.empty()) {
+		for (auto it = m_compteurs.begin(); it != m_compteurs.end(); it++) {
+			if (it->getNom() == counterName) {
 				m_compteurs.erase(it);
 
 				response->setHttpStatusCode(200);
@@ -319,8 +318,8 @@ void HttpServer::http_del_counter(Request *request, Response *response) {
 }
 
 std::optional<std::reference_wrapper<Compteur>> HttpServer::getCounter(const std::string &name) {
-	for(auto& cpt : m_compteurs) {
-		if(cpt.getNom() == name) {
+	for (auto &cpt: m_compteurs) {
+		if (cpt.getNom() == name) {
 			return cpt;
 		}
 	}
@@ -331,7 +330,7 @@ std::optional<std::reference_wrapper<Compteur>> HttpServer::getCounter(const std
 Compteur HttpServer::getStarCounter() {
 	Compteur cpt("etoile", 0);
 
-	for(auto &counter : m_compteurs) {
+	for (auto &counter: m_compteurs) {
 		cpt.inc(counter.getVal());
 	}
 
@@ -339,8 +338,8 @@ Compteur HttpServer::getStarCounter() {
 }
 
 bool HttpServer::counterExists(const std::string &name) {
-	for(const auto& cpt : m_compteurs) {
-		if(cpt.getNom() == name) {
+	for (const auto &cpt: m_compteurs) {
+		if (cpt.getNom() == name) {
 			return true;
 		}
 	}

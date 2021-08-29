@@ -119,6 +119,8 @@ class Request {
 		 */
 		std::unordered_map<std::string, std::string> m_params;
 
+		int m_requestBodyLength;
+
 };
 
 

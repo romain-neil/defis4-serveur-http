@@ -44,12 +44,13 @@ Request::Request(SOCKET client, std::string buffer) : m_url(Http::Url::UNKNOWN),
 
 	extractHeaders();
 
-	/* //TODO: check if all post content were uploaded
-	if(m_method == Http::POST) {
-		//We need to check if all content were uploaded
-
-		//if(std::stoi(getHeader("Content-Length")))
-	}*/
+	//TODO: check if all post content were uploaded
+//	if(m_method == Http::POST) {
+//		//We need to check if all content were uploaded
+//		if(std::stoi(getHeader("Content-Length"))) {
+//			//
+//		}
+//	}
 
 	//Clear some unused stuff
 	m_req.clear();
@@ -132,24 +133,24 @@ void Request::determineRoute() {
 }
 
 std::string Request::getParam(const std::string &name) {
-	for (const auto &param : m_params) {
+	for (const auto &param: m_params) {
 		if (param.first == name) {
 			return param.second;
 		}
 	}
 
-	return std::string();
+	return {};
 }
 
 std::string Request::getHeader(std::string name) {
 	std::transform(name.begin(), name.end(), name.begin(), [](char c) { return std::tolower(c); });
-	for (const auto &header : m_headers) {
+	for (const auto &header: m_headers) {
 		if (header.first == name) {
 			return header.second;
 		}
 	}
 
-	return std::string();
+	return {};
 }
 
 void Request::addHeader(std::string name, const std::string &val) {
@@ -201,7 +202,7 @@ void Request::sanitarizeJson() {
 	std::string json;
 
 	//For each char in the json
-	for (auto c : m_req) {
+	for (auto c: m_req) {
 		if (c != '\r' && c != '\n' && c != '\t') {
 			//We add that char to the final string
 			json.push_back(c);

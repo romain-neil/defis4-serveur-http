@@ -10,7 +10,8 @@
 class Compteur {
 
 	public:
-		explicit Compteur(std::string  nom, int initialValue = 0);
+		explicit Compteur(std::string nom, int initialValue = 0);
+
 		~Compteur() = default;
 
 		/**

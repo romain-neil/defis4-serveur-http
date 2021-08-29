@@ -27,7 +27,8 @@ class HttpServer {
 
 	public:
 
-		explicit HttpServer(int port, std::string  bindAddress = "127.0.0.0", std::string bindHost = "localhost");
+		explicit HttpServer(int port, std::string bindAddress = "127.0.0.0", std::string bindHost = "localhost");
+
 		~HttpServer();
 
 		void describe() const;
@@ -51,15 +52,20 @@ class HttpServer {
 
 		void handleRoute(SOCKET client);
 
-		void respond(Request *request, Response *response, const Compteur& compteur);
+		void respond(Request *request, Response *response, const Compteur &compteur);
+
 		void respond(Request *request, Response *response, const std::vector<Compteur> &counters);
 
-		static std::string jsonify(const Compteur& cpt);
+		static std::string jsonify(const Compteur &cpt);
 
-		void http_get_counter(Request *request, Response *response, const std::string& name = "");
+		void http_get_counter(Request *request, Response *response, const std::string &name = "");
+
 		void http_get_all_counters(Request *request, Response *response);
+
 		void http_post_counter(Request *request, Response *response);
+
 		void http_put_counter(Request *request, Response *response);
+
 		void http_del_counter(Request *request, Response *response);
 
 		int m_port;

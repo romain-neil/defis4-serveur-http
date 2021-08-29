@@ -20,6 +20,7 @@ class Response {
 	public:
 
 		explicit Response(SOCKET socket);
+
 		~Response() = default;
 
 		/**
@@ -34,11 +35,11 @@ class Response {
 		 */
 		void dryRun();
 
-		void write(const std::string& data);
+		void write(const std::string &data);
 
 		void setContentType(const std::string &contentType);
 
-		void setHeader(const std::string& headerName, const std::string& headerValue);
+		void setHeader(const std::string &headerName, const std::string &headerValue);
 
 		void setHttpStatusCode(int code);
 

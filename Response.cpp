@@ -23,11 +23,11 @@ void Response::dryRun() {
 	m_isDryRun = true;
 }
 
-void Response::write(const std::string& data) {
+void Response::write(const std::string &data) {
 	setHeader("Server", "TinyWebServer v1.0");
 	setHeader("Content-Length", std::to_string(data.length()));
 
-	if(!m_isDryRun) {
+	if (!m_isDryRun) {
 		m_response << std::endl << data;
 	}
 
@@ -39,7 +39,7 @@ void Response::setContentType(const std::string &contentType) {
 	setHeader("Content-Type", contentType);
 }
 
-void Response::setHeader(const std::string& headerName, const std::string& headerValue) {
+void Response::setHeader(const std::string &headerName, const std::string &headerValue) {
 	m_response << headerName << ": " << headerValue << std::endl;
 }
 
