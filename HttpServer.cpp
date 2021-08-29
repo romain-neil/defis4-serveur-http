@@ -341,12 +341,7 @@ Compteur HttpServer::getStarCounter() {
 }
 
 bool HttpServer::counterExists(const std::string &name) {
-	for (const auto &cpt: m_compteurs) {
-		if (cpt.getNom() == name) {
-			return true;
-		}
-	}
-
-	//return std::any_of(m_compteurs.begin(), m_compteurs.end(), [](const Compteur& cpt) { return cpt.getNom() == name; });
-	return false;
+	return std::any_of(m_compteurs.begin(), m_compteurs.end(),[&name](const Compteur& cpt) {
+		return cpt.getNom() == name;
+	});
 }
