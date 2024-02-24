@@ -6,10 +6,7 @@
 
 #include <utility>
 
-HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string bindHost) : m_port(port),																						 m_bindAddr(std::move(
-																									 bindAddress)),
-																							 m_bindHost(std::move(
-																									 bindHost)) {
+HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string bindHost) : m_port(port),  m_bindAddr(std::move(bindAddress)), m_bindHost(std::move(bindHost)) {
 #if defined(_WIN32)
 	WSADATA WSAData;
 	WSAStartup(MAKEWORD(2, 2), &WSAData);
