@@ -48,6 +48,16 @@ void Response::setHttpStatusCode(int code) {
 	m_response << code << " " << HttpStatus::reasonPhrase(code) << std::endl;
 }
 
+void Response::close() {
+	setHttpStatusCode(204);
+
+	setHeader("Server", "TinyWebServer v1.0");
+	setHeader("Content-Length", "0");
+	setHeader("Connection", "close");
+
+	send(m_socket, m_response.str().c_str(), static_cast<int>(m_response.str().size()), 0);
+}
+
 void Response::html() {
 	setContentType("text/html; charset=utf-8");
 }

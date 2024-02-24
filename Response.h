@@ -46,6 +46,11 @@ class Response {
 		void setHttpStatusCode(int code);
 
 		/**
+		 * Close the request and send to the client a 204 status
+		 */
+		void close();
+
+		/**
 		 * Send html response
 		 */
 		void html();
