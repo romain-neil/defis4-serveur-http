@@ -26,6 +26,7 @@ void Response::dryRun() {
 void Response::write(const std::string &data) {
 	setHeader("Server", "TinyWebServer v1.0");
 	setHeader("Content-Length", std::to_string(data.length()));
+	setHeader("Connection", "close");
 
 	if (!m_isDryRun) {
 		m_response << std::endl << data;
