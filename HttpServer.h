@@ -2,6 +2,8 @@
 // Created by Romain Neil on 26/03/2021.
 //
 
+#pragma once
+
 #ifndef HTTP_COUNTER_HTTPSERVER_H
 #define HTTP_COUNTER_HTTPSERVER_H
 
