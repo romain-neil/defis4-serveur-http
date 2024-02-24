@@ -36,6 +36,8 @@ HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string
 	sin.sin_family = family;
 	sin.sin_port = htons(port);
 
+	std::cout << "Bind addr = " << m_bindAddr << ", Port = " << m_port << std::endl;
+
 	if (bind(masterSocket, reinterpret_cast<sockaddr *>(&sin), sizeof sin) == SOCKET_ERROR) {
 		std::cerr << "Unable to bind !" << std::endl;
 
