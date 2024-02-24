@@ -27,7 +27,7 @@ HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string
 	sockaddr_in sin = {0};
 
 	//Bind to specific ip address, or to 127.0.0.1 by default
-	if (bindAddress.empty()) {
+	if (m_bindAddr.empty()) {
 		sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	} else {
 		InetPton(family, m_bindAddr.c_str(), &sin.sin_addr.s_addr);
