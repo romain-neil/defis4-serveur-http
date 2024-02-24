@@ -40,7 +40,12 @@ HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string
 	sin.sin_port = htons(port);
 
 	if (bind(masterSocket, reinterpret_cast<sockaddr *>(&sin), sizeof sin) == SOCKET_ERROR) {
-		perror("unable to bind !");
+		std::cerr << "Unable to bind !" << std::endl;
+
+#if defined(_WIN32)
+		std::cerr << "Error: " << WSAGetLastError() << std::endl;
+#endif
+
 		exit(errno);
 	}
 
