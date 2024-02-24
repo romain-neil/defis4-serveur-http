@@ -287,8 +287,7 @@ void HttpServer::http_put_counter(Request *request, Response *response) {
 				if (v > cpt.getVal()) {
 					cpt.setVal(v);
 
-					response->setHttpStatusCode(204);
-					response->write("");
+					response->close();
 
 					return;
 				}
