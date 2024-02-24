@@ -261,7 +261,7 @@ void HttpServer::http_post_counter(Request *request, Response *response) {
 	//Create a new counter
 	if (!name.empty()) {
 		//Header exists and are of expected type
-		if (!counterExists(name)) { //If the counter doesn't exists, we create it
+		if (!counterExists(name)) { //If the counter doesn't exist, we create it
 			Compteur cpt(name, 1);
 			m_compteurs.push_back(cpt);
 		}
