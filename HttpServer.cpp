@@ -17,7 +17,7 @@ HttpServer::HttpServer(int port, std::string bindAddress, bool ipv6, std::string
 	masterSocket = socket(family, SOCK_STREAM, IPPROTO_TCP);
 
 	if (masterSocket == INVALID_SOCKET) {
-		std::cerr << "failed to bind" << std::endl;
+		std::cerr << "failed to create master socker" << std::endl;
 
 #if defined(_WIN32)
 		std::cerr << "Error: " << WSAGetLastError() << std::endl;
